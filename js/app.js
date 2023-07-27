@@ -44,4 +44,6 @@ async function debugCustomQuery(event) {
   renderDebug(xml);
 }
 
-debugStatus();
+// Debugging
+// debugStatus();
+// window.debug.showModal();
