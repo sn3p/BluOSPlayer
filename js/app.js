@@ -21,9 +21,9 @@ async function debugStatus() {
   // console.log(statusNode);
 
   // Example of how to access the XML data
-  // console.info("etag:", statusNode.getAttribute("etag"));
-  // console.info("album:", statusNode.querySelector("album").textContent);
-  // console.info(
+  // console.debug("etag:", statusNode.getAttribute("etag"));
+  // console.debug("album:", statusNode.querySelector("album").textContent);
+  // console.debug(
   //   "artist:",
   //   statusNode.querySelector("artist").childNodes[0].nodeValue
   // );

@@ -23,31 +23,51 @@ class NodePlayer {
 
     const play = element.querySelector(classPrefix + "play");
     const pause = element.querySelector(classPrefix + "pause");
+    const stop = element.querySelector(classPrefix + "stop");
+    const prev = element.querySelector(classPrefix + "prev");
+    const next = element.querySelector(classPrefix + "next");
 
     this.controls = {
       element,
       play,
       pause,
+      stop,
+      prev,
+      next,
     };
 
     play.addEventListener("click", this.play.bind(this));
     pause.addEventListener("click", this.pause.bind(this));
+    stop.addEventListener("click", this.stop.bind(this));
+    prev.addEventListener("click", this.prev.bind(this));
+    next.addEventListener("click", this.next.bind(this));
   }
 
   async play(seek, url) {
-    const xml = await player.query(`/Play`);
-    console.log(xml);
+    this.query("/Play");
   }
 
   async pause(toggle) {
-    const xml = await player.query(`/Pause`);
-    console.log(xml);
+    this.query("/Pause");
+  }
+
+  async stop() {
+    this.query("/Stop");
+  }
+
+  async prev() {
+    this.query("/Back");
+  }
+
+  async next() {
+    this.query("/Skip");
   }
 
   async query(params) {
     try {
       const response = await fetch(host + params);
       const xml = await response.text();
+      console.debug(xml);
       return xml;
     } catch (error) {
       console.error(error);
