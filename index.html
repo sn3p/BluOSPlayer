@@ -10,10 +10,26 @@
 <body>
   <h1>NodePlayer</h1>
 
+  <div class="player">
+    <div class="player__controls">
+      <button class="player__button player__button--play">&#x23f5;</button>
+      <button class="player__button player__button--pause">&#x23f8;</button>
+    </div>
+  </div>
+
+  <hr>
+
   <section class="debug">
     <time id="debug-date"></time>
+
     <button onclick="debugStatus()">/Status</button>
     <button onclick="debugSyncStatus()">/SyncStatus</button>
+
+    <form onsubmit="debugCustomQuery(event)">
+      <input type="text" name="query" value="/Play">
+      <button type="submit">Send</button>
+    </form>
+
     <pre><code id="debug-output"></code></pre>
   </section>
 

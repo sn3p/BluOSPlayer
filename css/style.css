@@ -3,6 +3,14 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.player {
+  margin: 1em 0;
+}
+
+.debug {
+  margin: 1em 0;
+}
+
 .debug pre {
   border: 1px solid #ccc;
   padding: 1em;
@@ -16,4 +24,9 @@ body {
   color: #888;
   font-size: 12px;
   float: right;
+}
+
+.debug form {
+  display: inline;
+  margin-left: 1em;
 }
