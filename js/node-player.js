@@ -10,9 +10,13 @@ class NodePlayer {
     this.host = host;
   }
 
-  async fetch(query, callback) {
-    const response = await fetch(host + query);
-    const xml = await response.text();
-    return xml;
+  async fetch(query) {
+    try {
+      const response = await fetch(host + query);
+      const xml = await response.text();
+      return xml;
+    } catch (error) {
+      console.error(error);
+    }
   }
 }

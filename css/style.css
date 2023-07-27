@@ -3,14 +3,17 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.debug button {
-}
-
-.debug-output {
+.debug pre {
   border: 1px solid #ccc;
   padding: 1em;
   border-radius: 8px;
   background-color: #f5f5f5;
   font-size: 12px;
   overflow: auto;
+}
+
+.debug time {
+  color: #888;
+  font-size: 12px;
+  float: right;
 }
