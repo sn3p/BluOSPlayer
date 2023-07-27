@@ -15,62 +15,83 @@ class NodePlayer {
     this.host = host;
 
     this.initControls();
+
+    this.status({ timeout: 100, etag: "123" });
   }
 
   initControls() {
     const element = this.element.querySelector(".player__controls");
     const classPrefix = ".player__button--";
 
-    const play = element.querySelector(classPrefix + "play");
-    const pause = element.querySelector(classPrefix + "pause");
-    const stop = element.querySelector(classPrefix + "stop");
-    const prev = element.querySelector(classPrefix + "prev");
-    const next = element.querySelector(classPrefix + "next");
+    this.controls = { element };
 
-    this.controls = {
-      element,
-      play,
-      pause,
-      stop,
-      prev,
-      next,
-    };
+    ["play", "pause", "stop", "prev", "next"].forEach((name) => {
+      const el = element.querySelector(classPrefix + name);
+      el.addEventListener("click", this[name].bind(this));
+      this.controls[name] = el;
+    });
 
-    play.addEventListener("click", this.play.bind(this));
-    pause.addEventListener("click", this.pause.bind(this));
-    stop.addEventListener("click", this.stop.bind(this));
-    prev.addEventListener("click", this.prev.bind(this));
-    next.addEventListener("click", this.next.bind(this));
+    // Volume
+    const volume = element.querySelector(".player__volume");
+    volume.addEventListener("change", (event) =>
+      this.volume(event.target.value)
+    );
+    this.controls.volume = volume;
   }
 
-  async play(seek, url) {
+  async status(params = {}) {
+    const urlParams = new URLSearchParams(params);
+    const query = `/Status?${urlParams.toString()}`;
+
+    const xml = await this.query(query);
+
+    const doc = this.parseXML(xml);
+    const statusNode = doc.querySelector("status");
+
+    // console.debug("etag:", statusNode.getAttribute("etag"));
+
+    // Set volume
+    this.controls.volume.disabled = false;
+    this.controls.volume.value = statusNode.querySelector("volume").textContent;
+  }
+
+  play(seek, url) {
     this.query("/Play");
   }
 
-  async pause(toggle) {
+  pause(toggle) {
     this.query("/Pause");
   }
 
-  async stop() {
+  stop() {
     this.query("/Stop");
   }
 
-  async prev() {
+  prev() {
     this.query("/Back");
   }
 
-  async next() {
+  next() {
     this.query("/Skip");
   }
 
-  async query(params) {
+  volume(level) {
+    this.query(`/Volume?level=${level}`);
+  }
+
+  async query(query) {
     try {
-      const response = await fetch(host + params);
+      const response = await fetch(host + query);
       const xml = await response.text();
       console.debug(xml);
       return xml;
     } catch (error) {
       console.error(error);
     }
+  }
+
+  parseXML(xml) {
+    const parser = new DOMParser();
+    return parser.parseFromString(xml, "application/xml");
   }
 }

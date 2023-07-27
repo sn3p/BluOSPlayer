@@ -30,6 +30,16 @@ body {
   width: 100%;
 }
 
+.player__controls {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.player__volume {
+  margin-left: auto;
+}
+
 /*
 Debugging
 */
@@ -89,10 +99,9 @@ Debugging
   border-radius: 50%;
   cursor: pointer;
   display: flex;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   height: 1.2rem;
   justify-content: center;
-  line-height: 1;
   padding: 0;
   width: 1.2rem;
 }

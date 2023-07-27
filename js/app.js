@@ -1,4 +1,5 @@
 const host = "http://192.168.1.81:11000";
+
 const element = document.querySelector(".player");
 const player = new NodePlayer(element, host);
 

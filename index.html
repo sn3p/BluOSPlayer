@@ -16,6 +16,8 @@
         <button class="player__button player__button--pause">&#x23f8;</button>
         <button class="player__button player__button--stop">&#x23f9;</button>
         <button class="player__button player__button--next">&#x23ed;</button>
+
+        <input class="player__volume" type="range" min="0" max="100" value="0" disabled>
       </div>
     </div>
   </div>
@@ -32,7 +34,7 @@
       </form>
 
       <time id="debug-date"></time>
-      <button onclick="window.debug.close()" class="close-button">&#x2715;</button>
+      <button onclick="window.debug.close()" class="close-button">&times;</button>
     </div>
     <pre><code id="debug-output"></code></pre>
   </dialog>
