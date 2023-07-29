@@ -14,9 +14,22 @@ class NodePlayer {
     this.element = element;
     this.host = host;
 
+    this.info = this.element.querySelector(".player__info");
+    this.infoTitle = this.info.querySelector(".player__info--title");
+    this.infoArtist = this.info.querySelector(".player__info--artist");
+    this.infoAlbum = this.info.querySelector(".player__info--album");
+
+    this.cover = this.element.querySelector(".player__cover");
+    this.coverBackground = this.cover.querySelector(
+      ".player__cover--background"
+    );
+    this.coverImage = this.cover.querySelector(".player__cover--image");
+
     this.initControls();
 
-    this.status({ timeout: 100, etag: "123" });
+    // Get player status
+    // this.status({ timeout: 100, etag: "123" });
+    this.status();
   }
 
   initControls() {
@@ -39,6 +52,9 @@ class NodePlayer {
     this.controls.volume = volume;
   }
 
+  // TODO:
+  // - Handle timeout and etag
+  // - Get diff of changes
   async status(params = {}) {
     const urlParams = new URLSearchParams(params);
     const query = `/Status?${urlParams.toString()}`;
@@ -50,10 +66,40 @@ class NodePlayer {
 
     // console.debug("etag:", statusNode.getAttribute("etag"));
 
+    // Set track info
+    const title = this.statusValue(doc, "title1");
+    const artist = this.statusValue(doc, "title2");
+    const album = this.statusValue(doc, "title3");
+    this.setInfo(title, artist, album);
+
+    // Set album art
+    const image = this.statusValue(doc, "image");
+    this.setAlbumArt(image);
+
     // Set volume
     this.controls.volume.disabled = false;
     this.controls.volume.value = statusNode.querySelector("volume").textContent;
   }
+
+  setInfo(title, artist, album) {
+    this.infoTitle.textContent = title;
+    this.infoArtist.textContent = artist;
+    this.infoAlbum.textContent = album;
+  }
+
+  setAlbumArt(image) {
+    this.coverImage.src = image;
+    this.coverImage.alt = "Cover art";
+    this.coverBackground.style.backgroundImage = `url(${image})`;
+  }
+
+  statusValue(doc, name) {
+    return doc.getElementsByTagName(name)[0]?.textContent;
+  }
+
+  /*
+  Playback
+  */
 
   play(seek, url) {
     this.query("/Play");
