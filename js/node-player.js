@@ -102,7 +102,10 @@ class NodePlayer {
   setAlbumArt(url) {
     this.coverImage.src = url;
     this.coverImage.alt = "Cover art";
-    this.element.style.setProperty("--player-background-image", url);
+    this.element.style.setProperty(
+      "--player-background-image",
+      `url("${url}")`
+    );
   }
 
   /*
