@@ -29,16 +29,12 @@ class NodePlayer {
     this.infoAlbum = this.info.querySelector(".player__info--album");
 
     this.cover = this.element.querySelector(".player__cover");
-    this.coverBackground = this.cover.querySelector(
-      ".player__cover--background"
-    );
-
     this.coverImage = this.cover.querySelector(".player__cover--image");
     this.coverImage.addEventListener("load", (event) => {
       const color = new ColorThief().getColor(event.target);
 
       this.element.style.setProperty(
-        "--cover-color",
+        "--player-background-color",
         `rgb(${color.join(",")})`
       );
     });
@@ -103,10 +99,10 @@ class NodePlayer {
     this.infoAlbum.textContent = album;
   }
 
-  setAlbumArt(image) {
-    this.coverImage.src = image;
+  setAlbumArt(url) {
+    this.coverImage.src = url;
     this.coverImage.alt = "Cover art";
-    this.coverBackground.style.backgroundImage = `url(${image})`;
+    this.element.style.setProperty("--player-background-image", url);
   }
 
   /*
