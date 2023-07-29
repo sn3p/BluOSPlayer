@@ -14,6 +14,15 @@ class NodePlayer {
     this.element = element;
     this.host = host;
 
+    this.setupUI();
+    this.setupControls();
+
+    // Get player status
+    // this.status({ timeout: 100, etag: "123" });
+    this.status();
+  }
+
+  setupUI() {
     this.info = this.element.querySelector(".player__info");
     this.infoTitle = this.info.querySelector(".player__info--title");
     this.infoArtist = this.info.querySelector(".player__info--artist");
@@ -23,16 +32,19 @@ class NodePlayer {
     this.coverBackground = this.cover.querySelector(
       ".player__cover--background"
     );
+
     this.coverImage = this.cover.querySelector(".player__cover--image");
+    this.coverImage.addEventListener("load", (event) => {
+      const color = new ColorThief().getColor(event.target);
 
-    this.initControls();
-
-    // Get player status
-    // this.status({ timeout: 100, etag: "123" });
-    this.status();
+      this.element.style.setProperty(
+        "--cover-color",
+        `rgb(${color.join(",")})`
+      );
+    });
   }
 
-  initControls() {
+  setupControls() {
     const element = this.element.querySelector(".player__controls");
     const classPrefix = ".player__button--";
 
@@ -81,6 +93,10 @@ class NodePlayer {
     this.controls.volume.value = statusNode.querySelector("volume").textContent;
   }
 
+  statusValue(doc, name) {
+    return doc.getElementsByTagName(name)[0]?.textContent;
+  }
+
   setInfo(title, artist, album) {
     this.infoTitle.textContent = title;
     this.infoArtist.textContent = artist;
@@ -91,10 +107,6 @@ class NodePlayer {
     this.coverImage.src = image;
     this.coverImage.alt = "Cover art";
     this.coverBackground.style.backgroundImage = `url(${image})`;
-  }
-
-  statusValue(doc, name) {
-    return doc.getElementsByTagName(name)[0]?.textContent;
   }
 
   /*
