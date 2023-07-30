@@ -39,22 +39,22 @@ body {
   background-image: var(--player-background-image);
   background-position: center;
   background-size: cover;
-  filter: blur(10px);
+  filter: blur(12px);
   opacity: 0.2;
 }
 
 .player::after {
   background-image: radial-gradient(
     at center,
-    rgba(0, 0, 0, 0.4),
-    rgba(0, 0, 0, 0.9)
+    rgba(0, 0, 0, 0.3),
+    rgba(0, 0, 0, 0.8)
   );
   /* opacity: 0.7; */
   /* mix-blend-mode: overlay; */
 }
 
 .player__container {
-  max-width: 800px;
+  max-width: 600px;
   width: 100%;
   position: relative;
   z-index: 2;
@@ -66,6 +66,7 @@ body {
   flex-direction: column;
   text-align: center;
   mix-blend-mode: overlay;
+  /* mix-blend-mode: difference; */
 }
 
 .player__info > :empty {
@@ -99,6 +100,14 @@ body {
   width: 100%;
   max-height: 400px;
   max-width: 400px;
+}
+
+.player__time {
+  margin: 1rem 0;
+}
+
+.player__time--progress {
+  width: 100%;
 }
 
 .player__controls {

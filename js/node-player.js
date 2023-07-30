@@ -38,6 +38,9 @@ class NodePlayer {
         `rgb(${color.join(",")})`
       );
     });
+
+    this.time = this.element.querySelector(".player__time");
+    this.timeProgress = this.time.querySelector(".player__time--progress");
   }
 
   setupControls() {
@@ -84,11 +87,17 @@ class NodePlayer {
     const image = this.statusValue(doc, "image");
     this.setAlbumArt(image);
 
+    // Set playback state
+    const secs = this.statusValue(doc, "secs");
+    const totlen = this.statusValue(doc, "totlen");
+    this.setPlaybackState(secs, totlen);
+
     // Set volume
     this.controls.volume.disabled = false;
     this.controls.volume.value = statusNode.querySelector("volume").textContent;
   }
 
+  // TODO: Multiple values at once
   statusValue(doc, name) {
     return doc.getElementsByTagName(name)[0]?.textContent;
   }
@@ -106,6 +115,12 @@ class NodePlayer {
       "--player-background-image",
       `url("${url}")`
     );
+  }
+
+  setPlaybackState(secs, totlen) {
+    console.log(secs, totlen, (secs / totlen) * 60);
+    const progress = (secs / totlen) * 100;
+    this.timeProgress.value = progress;
   }
 
   /*
