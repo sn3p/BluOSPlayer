@@ -18,6 +18,16 @@ class NodePlayer {
     this.element = element;
     this.host = host;
 
+    // https://github.com/NaturalIntelligence/fast-xml-parser
+    this.xmlParser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: "",
+      attributesGroupName: "@",
+    });
+
+    this.etag = null;
+    this.status = {};
+
     this.setupUI();
     this.setupControls();
 
@@ -44,6 +54,8 @@ class NodePlayer {
 
     this.time = this.element.querySelector(".player__time");
     this.timeProgress = this.time.querySelector(".player__time--progress");
+    this.timeCurrent = this.time.querySelector(".player__time--current");
+    this.timeDuration = this.time.querySelector(".player__time--duration");
   }
 
   setupControls() {
@@ -66,18 +78,20 @@ class NodePlayer {
     this.controls.volume = volume;
   }
 
-  // Start listening to the player
+  // Listening to the player
+  // TODO: Get status diff?
   // TODO: Check for SyncStatus?
   async longpoll() {
-    const xml = await this.status({ timeout: 100, etag: this.etag });
-
-    // Set etag for next request (longpolling)
-    const etag = xml.querySelector("status").getAttribute("etag");
-    // console.debug(etag, this.etag === etag ? "(not changed)" : "(changed)");
-    this.etag = etag;
+    const xml = await this.getStatus({ timeout: 100, etag: this.etag });
+    // Parse XML to JSON
+    this.status = this.xmlParser.parse(xml).status;
+    // Get etag from status
+    this.etag = this.status["@"].etag;
+    console.debug(this.etag, this.status);
 
     // Update player
-    this.updatePlayer(xml);
+    // TODO: skip update if etag hasn't changed?
+    this.updatePlayer();
 
     // start longpoll again
     // TODO: Handle timeout/errors?
@@ -87,44 +101,45 @@ class NodePlayer {
     this.longpoll();
   }
 
-  async status(params = {}) {
+  async getStatus(params = {}) {
     // Build query
     const urlParams = new URLSearchParams(params);
     const query = `/Status?${urlParams.toString()}`;
-
-    // Get XML
-    const xml = await this.query(query);
-    return this.parseXML(xml);
+    return await this.query(query);
   }
 
-  // TODO: skip update if etag hasn't changed?
-  updatePlayer(xml) {
-    // Set track info
-    const title = this.statusValue(xml, "title1");
-    if (title) {
-      const artist = this.statusValue(xml, "title2");
-      const album = this.statusValue(xml, "title3");
-      this.setInfo(title, artist, album);
-    }
+  updatePlayer() {
+    this.updateNowPlaying();
+    this.updateAlbumArt();
+    this.updateVolume();
+    this.updatePlaybackState();
+  }
 
-    // Set album art
-    const image = this.statusValue(xml, "image");
-    if (image) {
-      this.setAlbumArt(image);
-    }
+  // DOCS: title1, title2 and title3 MUST be used as the text of any UI that displays
+  //   three lines of now-playing metadata. Do not use values such as album, artist and name.
+  updateNowPlaying() {
+    const { title1, title2, title3 } = this.status;
 
-    // Set playback state
-    // DOCS: Clients are required to increment the playback position, when
-    //  state is play or stream, based on the interval since the response.
-    const secs = this.statusValue(xml, "secs");
-    const totlen = this.statusValue(xml, "totlen");
-    if (secs && totlen) {
-      this.setPlaybackState(secs, totlen);
-    }
+    this.infoTitle.textContent = title1;
+    this.infoArtist.textContent = title2;
+    this.infoAlbum.textContent = title3;
+  }
 
-    // Set volume
-    const volume = this.statusValue(xml, "volume");
-    if (volume) {
+  updateAlbumArt() {
+    const { image } = this.status;
+
+    this.coverImage.src = image;
+    this.coverImage.alt = "Cover art";
+    this.element.style.setProperty(
+      "--player-background-image",
+      `url("${image}")`
+    );
+  }
+
+  updateVolume() {
+    const { volume } = this.status;
+
+    if (typeof volume == "number") {
       this.controls.volume.disabled = false;
       this.controls.volume.value = volume;
     } else {
@@ -132,30 +147,28 @@ class NodePlayer {
     }
   }
 
-  // TODO: Multiple values at once?
-  statusValue(xml, name) {
-    return xml.querySelector(name)?.textContent;
-  }
+  // DOCS: Clients are required to increment the playback position, when
+  //  state is play or stream, based on the interval since the response.
+  updatePlaybackState() {
+    const { secs, totlen } = this.status;
 
-  setInfo(title, artist, album) {
-    this.infoTitle.textContent = title;
-    this.infoArtist.textContent = artist;
-    this.infoAlbum.textContent = album;
-  }
+    if (typeof secs === "number") {
+      this.timeCurrent.textContent = secs;
+    } else {
+      this.timeCurrent.textContent = "0:00";
+    }
 
-  setAlbumArt(url) {
-    this.coverImage.src = url;
-    this.coverImage.alt = "Cover art";
-    this.element.style.setProperty(
-      "--player-background-image",
-      `url("${url}")`
-    );
-  }
+    if (typeof totlen === "number") {
+      this.timeDuration.textContent = totlen;
+    } else {
+      this.timeDuration.textContent = "∞";
+    }
 
-  setPlaybackState(secs, totlen) {
-    console.log(secs, totlen, (secs / totlen) * 60);
-    const progress = (secs / totlen) * 100;
-    this.timeProgress.value = progress;
+    if (typeof secs === "number" && typeof totlen === "number") {
+      this.timeProgress.value = (secs / totlen) * 100;
+    } else {
+      this.timeProgress.value = 0;
+    }
   }
 
   /*
@@ -190,15 +203,10 @@ class NodePlayer {
     try {
       const response = await fetch(host + query);
       const xml = await response.text();
-      console.debug(xml);
+      // console.debug(xml);
       return xml;
     } catch (error) {
       console.error(error);
     }
-  }
-
-  parseXML(xml) {
-    const parser = new DOMParser();
-    return parser.parseFromString(xml, "application/xml");
   }
 }
