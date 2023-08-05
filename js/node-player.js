@@ -25,8 +25,9 @@ class NodePlayer {
       attributesGroupName: "@",
     });
 
-    this.etag = null;
     this.status = {};
+    this.etag = null;
+    this.playbackTimer = null;
 
     this.setupUI();
     this.setupControls();
@@ -87,7 +88,7 @@ class NodePlayer {
     this.status = this.xmlParser.parse(xml).status;
     // Get etag from status
     this.etag = this.status["@"].etag;
-    console.debug(this.etag, this.status);
+    console.debug(this.status);
 
     // Update player
     // TODO: skip update if etag hasn't changed?
@@ -109,10 +110,31 @@ class NodePlayer {
   }
 
   updatePlayer() {
+    // Clear current playback timer
+    this.stopPlaybackTimer();
+
+    // Update player UI
     this.updateNowPlaying();
     this.updateAlbumArt();
     this.updateVolume();
     this.updatePlaybackState();
+
+    // Start playback timer
+    if (this.status.state === "play" || this.status.state === "stream") {
+      this.startPlaybackTimer();
+    }
+  }
+
+  // Updates playback state every second
+  startPlaybackTimer() {
+    this.playbackTimer = setInterval(() => {
+      this.status.secs++;
+      this.updatePlaybackState();
+    }, 1000);
+  }
+
+  stopPlaybackTimer() {
+    clearInterval(this.playbackTimer);
   }
 
   // DOCS: title1, title2 and title3 MUST be used as the text of any UI that displays

@@ -68,21 +68,17 @@ body {
   mix-blend-mode: overlay;
   /* mix-blend-mode: difference; */
 }
-
 .player__info > :empty {
   display: none;
 }
-
 .player__info--title {
   margin: 0 0 0.5rem;
 }
-
 .player__info--artist {
   font-size: 1.1rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
-
 .player__info--album {
   margin-bottom: 0.5rem;
   opacity: 0.5;
@@ -94,7 +90,6 @@ body {
   justify-content: center;
   margin: 1rem auto;
 }
-
 .player__cover--image {
   box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, 0.4);
   width: 100%;
@@ -105,9 +100,13 @@ body {
 .player__time {
   margin: 1rem 0;
 }
-
 .player__time--progress {
   width: 100%;
+}
+/* .player__time--current {
+} */
+.player__time--duration {
+  float: right;
 }
 
 .player__controls {
