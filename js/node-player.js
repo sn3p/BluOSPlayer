@@ -27,7 +27,7 @@ class NodePlayer {
 
     this.status = {};
     this.etag = null;
-    this.playbackTimer = null;
+    this.playTimer = null;
 
     this.setupUI();
     this.setupControls();
@@ -63,10 +63,18 @@ class NodePlayer {
     const element = this.element.querySelector(".player__controls");
     const classPrefix = ".player__button--";
 
+    // Old
     this.controls = { element };
-
     ["play", "pause", "stop", "prev", "next"].forEach((name) => {
       const el = element.querySelector(classPrefix + name);
+      el.addEventListener("click", this[name].bind(this));
+      this.controls[name] = el;
+    });
+
+    // New
+    const playback = this.element.querySelector(".player__playback");
+    ["play-pause"].forEach((name) => {
+      const el = playback.querySelector(classPrefix + name);
       el.addEventListener("click", this[name].bind(this));
       this.controls[name] = el;
     });
@@ -111,30 +119,31 @@ class NodePlayer {
 
   updatePlayer() {
     // Clear current playback timer
-    this.stopPlaybackTimer();
+    this.stopPlayTimer();
 
     // Update player UI
     this.updateNowPlaying();
     this.updateAlbumArt();
     this.updateVolume();
-    this.updatePlaybackState();
+    this.updateTime();
+    this.updateControls();
 
     // Start playback timer
     if (this.status.state === "play" || this.status.state === "stream") {
-      this.startPlaybackTimer();
+      this.startPlayTimer();
     }
   }
 
   // Updates playback state every second
-  startPlaybackTimer() {
-    this.playbackTimer = setInterval(() => {
+  startPlayTimer() {
+    this.playTimer = setInterval(() => {
       this.status.secs++;
-      this.updatePlaybackState();
+      this.updateTime();
     }, 1000);
   }
 
-  stopPlaybackTimer() {
-    clearInterval(this.playbackTimer);
+  stopPlayTimer() {
+    clearInterval(this.playTimer);
   }
 
   // DOCS: title1, title2 and title3 MUST be used as the text of any UI that displays
@@ -172,7 +181,7 @@ class NodePlayer {
 
   // DOCS: Clients are required to increment the playback position, when
   //  state is play or stream, based on the interval since the response.
-  updatePlaybackState() {
+  updateTime() {
     const { secs, totlen } = this.status;
 
     if (typeof secs === "number") {
@@ -187,6 +196,9 @@ class NodePlayer {
       this.timeDuration.textContent = "∞";
     }
 
+    // TODO: check canSeek?
+    // DOCS: If 1 then it is possible to scrub through the current track, in the range 0..totlen,
+    //  by use of the seek parameter to /Play. For example: /Play?seek=34.
     if (typeof secs === "number" && typeof totlen === "number") {
       this.timeProgress.value = (secs / totlen) * 100;
     } else {
@@ -195,25 +207,41 @@ class NodePlayer {
   }
 
   displayTime(seconds) {
+    seconds = Math.floor(seconds);
     let h = Math.floor(seconds / 3600);
     let m = Math.floor(seconds / 60) % 60;
     let s = seconds % 60;
 
-    let out = [];
+    let time = [];
     if (h > 0) {
-      out.push(h);
-      out.push(m.toString().padStart(2, "0"));
+      time.push(h);
+      time.push(m.toString().padStart(2, "0"));
     } else {
-      out.push(m);
+      time.push(m);
     }
-    out.push(s.toString().padStart(2, "0"));
+    time.push(s.toString().padStart(2, "0"));
 
-    return out.join(":");
+    return time.join(":");
+  }
+
+  updateControls() {
+    const { state } = this.status;
+    const isPlaying = ["play", "stream"].includes(state);
+
+    this.controls["play-pause"].classList.toggle("is-playing", isPlaying);
   }
 
   /*
   Playback
   */
+
+  ["play-pause"](event) {
+    if (["play", "stream"].includes(this.status.state)) {
+      this.pause();
+    } else {
+      this.play();
+    }
+  }
 
   play(seek, url) {
     this.query("/Play");
