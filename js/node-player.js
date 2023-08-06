@@ -147,6 +147,7 @@ class NodePlayer {
     this.infoAlbum.textContent = title3;
   }
 
+  // TODO: handle "local" images, e.g. "/Sources/images/ParadiseRadioIcon.png"
   updateAlbumArt() {
     const { image } = this.status;
 
@@ -175,13 +176,13 @@ class NodePlayer {
     const { secs, totlen } = this.status;
 
     if (typeof secs === "number") {
-      this.timeCurrent.textContent = secs;
+      this.timeCurrent.textContent = this.displayTime(secs);
     } else {
       this.timeCurrent.textContent = "0:00";
     }
 
     if (typeof totlen === "number") {
-      this.timeDuration.textContent = totlen;
+      this.timeDuration.textContent = this.displayTime(totlen);
     } else {
       this.timeDuration.textContent = "∞";
     }
@@ -191,6 +192,23 @@ class NodePlayer {
     } else {
       this.timeProgress.value = 0;
     }
+  }
+
+  displayTime(seconds) {
+    let h = Math.floor(seconds / 3600);
+    let m = Math.floor(seconds / 60) % 60;
+    let s = seconds % 60;
+
+    let out = [];
+    if (h > 0) {
+      out.push(h);
+      out.push(m.toString().padStart(2, "0"));
+    } else {
+      out.push(m);
+    }
+    out.push(s.toString().padStart(2, "0"));
+
+    return out.join(":");
   }
 
   /*
@@ -223,7 +241,9 @@ class NodePlayer {
 
   async query(query) {
     try {
-      const response = await fetch(host + query);
+      const response = await fetch(host + query).catch((error) => {
+        console.warn(error);
+      });
       const xml = await response.text();
       // console.debug(xml);
       return xml;
