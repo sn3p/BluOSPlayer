@@ -100,13 +100,16 @@ body {
 .player__time {
   margin: 1rem 0;
 }
-.player__time--progress {
-  width: 100%;
-}
 /* .player__time--current {
 } */
 .player__time--duration {
   float: right;
+}
+
+.player__time--progress {
+  /* appearance: none; */
+  width: 100%;
+  cursor: pointer;
 }
 
 .player__playback {
@@ -117,7 +120,7 @@ body {
   margin: 1rem 0;
 }
 .player__playback .player__button {
-  apearance: none;
+  appearance: none;
   border-radius: 50%;
   color: white;
   display: inline-flex;

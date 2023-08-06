@@ -54,9 +54,14 @@ class NodePlayer {
     });
 
     this.time = this.element.querySelector(".player__time");
-    this.timeProgress = this.time.querySelector(".player__time--progress");
     this.timeCurrent = this.time.querySelector(".player__time--current");
     this.timeDuration = this.time.querySelector(".player__time--duration");
+
+    this.timeProgress = this.time.querySelector(".player__time--progress");
+    this.timeProgress.addEventListener("input", (event) => {
+      const { value } = event.target;
+      this.seek(value);
+    });
   }
 
   setupControls() {
@@ -182,7 +187,8 @@ class NodePlayer {
   // DOCS: Clients are required to increment the playback position, when
   //  state is play or stream, based on the interval since the response.
   updateTime() {
-    const { secs, totlen } = this.status;
+    let { secs, totlen, canSeek } = this.status;
+    secs = Math.min(secs, totlen);
 
     if (typeof secs === "number") {
       this.timeCurrent.textContent = this.displayTime(secs);
@@ -196,12 +202,11 @@ class NodePlayer {
       this.timeDuration.textContent = "∞";
     }
 
-    // TODO: check canSeek?
-    // DOCS: If 1 then it is possible to scrub through the current track, in the range 0..totlen,
-    //  by use of the seek parameter to /Play. For example: /Play?seek=34.
     if (typeof secs === "number" && typeof totlen === "number") {
+      this.timeProgress.disabled = false;
       this.timeProgress.value = (secs / totlen) * 100;
     } else {
+      this.timeProgress.disabled = true;
       this.timeProgress.value = 0;
     }
   }
@@ -244,22 +249,37 @@ class NodePlayer {
   }
 
   play(seek, url) {
+    this.stopPlayTimer();
     this.query("/Play");
   }
 
   pause(toggle) {
+    this.stopPlayTimer();
     this.query("/Pause");
   }
 
+  seek(seconds) {
+    this.stopPlayTimer();
+
+    const { canSeek, totlen } = this.status;
+    if (canSeek !== 1) return;
+
+    const seek = Math.round((seconds / 100) * totlen);
+    this.query(`/Play?seek=${seek}`);
+  }
+
   stop() {
+    this.stopPlayTimer();
     this.query("/Stop");
   }
 
   prev() {
+    this.stopPlayTimer();
     this.query("/Back");
   }
 
   next() {
+    this.stopPlayTimer();
     this.query("/Skip");
   }
 
