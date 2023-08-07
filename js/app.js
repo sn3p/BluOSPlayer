@@ -1,7 +1,6 @@
-const host = "http://192.168.1.81:11000";
-
+const hostname = "192.168.1.81";
 const element = document.querySelector(".player");
-const player = new NodePlayer(element, host);
+const player = new BluOSPlayer(element, hostname);
 
 const debugOutput = document.getElementById("debug-output");
 const debugDate = document.getElementById("debug-date");
@@ -12,7 +11,7 @@ function renderDebug(text) {
 }
 
 async function debugStatus() {
-  const xml = await player.query(`/Status`);
+  const xml = await player.api.status();
 
   renderDebug(xml);
 
@@ -32,7 +31,7 @@ async function debugStatus() {
 }
 
 async function debugSyncStatus() {
-  const xml = await player.query(`/SyncStatus`);
+  const xml = await player.api.query(`/SyncStatus`);
 
   renderDebug(xml);
 }
@@ -41,7 +40,7 @@ async function debugCustomQuery(event) {
   event.preventDefault();
 
   const query = event.target.query.value;
-  const xml = await player.query(query);
+  const xml = await player.api.query(query);
 
   renderDebug(xml);
 }

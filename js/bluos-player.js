@@ -1,22 +1,20 @@
 /**
- * @class NodePlayer
+ * @class BluOSPlayer
+ * @classdesc Audio player for BluOS players.
  *
  * See Node API docs for more info:
  * https://content-bluesound-com.s3.amazonaws.com/uploads/2022/07/BluOS-Custom-Integration-API-v1.5.pdf
  *
- * TODO:
- * - API class for device commands
- * - Player class for player commands (with getters/setters)
- *
  * @constructor
  * @param {HTMLElement} element - The player element.
- * @param {string} host - The host or IP address of the Node.
+ * @param {string} hostname - The hostname or IP address of the Node.
  */
 
-class NodePlayer {
-  constructor(element, host) {
+class BluOSPlayer {
+  constructor(element, hostname) {
     this.element = element;
-    this.host = host;
+
+    this.api = new BluOSInterface(hostname);
 
     // https://github.com/NaturalIntelligence/fast-xml-parser
     this.xmlParser = new XMLParser({
@@ -96,7 +94,7 @@ class NodePlayer {
   // TODO: Get status diff?
   // TODO: Check for SyncStatus?
   async longpoll() {
-    const xml = await this.getStatus({ timeout: 100, etag: this.etag });
+    const xml = await this.api.status({ timeout: 100, etag: this.etag });
     // Parse XML to JSON
     this.status = this.xmlParser.parse(xml).status;
     // Get etag from status
@@ -113,13 +111,6 @@ class NodePlayer {
     //  requests for the same resource less than one second apart, even if the first
     //  request returns in less than one second.
     this.longpoll();
-  }
-
-  async getStatus(params = {}) {
-    // Build query
-    const urlParams = new URLSearchParams(params);
-    const query = `/Status?${urlParams.toString()}`;
-    return await this.query(query);
   }
 
   updatePlayer() {
@@ -187,8 +178,8 @@ class NodePlayer {
   // DOCS: Clients are required to increment the playback position, when
   //  state is play or stream, based on the interval since the response.
   updateTime() {
-    let { secs, totlen, canSeek } = this.status;
-    secs = Math.min(secs, totlen);
+    let { secs, totlen } = this.status;
+    // secs = Math.min(secs, totlen);
 
     if (typeof secs === "number") {
       this.timeCurrent.textContent = this.displayTime(secs);
@@ -241,25 +232,28 @@ class NodePlayer {
   */
 
   ["play-pause"](event) {
+    this.stopPlayTimer();
+
     if (["play", "stream"].includes(this.status.state)) {
-      this.pause();
+      this.api.pause();
     } else {
-      this.play();
+      this.api.play();
     }
   }
 
-  play(seek, url) {
+  play() {
     this.stopPlayTimer();
-    this.query("/Play");
+    this.api.play();
   }
 
   pause(toggle) {
     this.stopPlayTimer();
-    this.query("/Pause");
+    this.api.pause();
   }
 
   seek(seconds) {
     this.stopPlayTimer();
+    // this.api.seek(seconds);
 
     const { canSeek, totlen } = this.status;
     if (canSeek !== 1) return;
@@ -270,33 +264,20 @@ class NodePlayer {
 
   stop() {
     this.stopPlayTimer();
-    this.query("/Stop");
+    this.api.stop();
   }
 
   prev() {
     this.stopPlayTimer();
-    this.query("/Back");
+    this.api.prev();
   }
 
   next() {
     this.stopPlayTimer();
-    this.query("/Skip");
+    this.api.next();
   }
 
   volume(level) {
-    this.query(`/Volume?level=${level}`);
-  }
-
-  async query(query) {
-    try {
-      const response = await fetch(host + query).catch((error) => {
-        console.warn(error);
-      });
-      const xml = await response.text();
-      // console.debug(xml);
-      return xml;
-    } catch (error) {
-      console.error(error);
-    }
+    this.api.volume(level);
   }
 }
