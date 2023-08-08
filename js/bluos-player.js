@@ -23,6 +23,9 @@ class BluOSPlayer {
       attributesGroupName: "@",
     });
 
+    // Used to get the dominant color from cover images
+    this.colorThief = new ColorThief();
+
     this.status = {};
     this.etag = null;
     this.playTimer = null;
@@ -42,14 +45,6 @@ class BluOSPlayer {
 
     this.cover = this.element.querySelector(".player__cover");
     this.coverImage = this.cover.querySelector(".player__cover--image");
-    this.coverImage.addEventListener("load", (event) => {
-      const color = new ColorThief().getColor(event.target);
-
-      this.element.style.setProperty(
-        "--player-background-color",
-        `rgb(${color.join(",")})`
-      );
-    });
 
     this.time = this.element.querySelector(".player__time");
     this.timeCurrent = this.time.querySelector(".player__time--current");
@@ -84,9 +79,10 @@ class BluOSPlayer {
 
     // Volume
     const volume = element.querySelector(".player__volume");
-    volume.addEventListener("change", (event) =>
-      this.volume(event.target.value)
-    );
+    volume.addEventListener("change", (event) => {
+      const volume = Number(event.target.value);
+      this.volume(volume);
+    });
     this.controls.volume = volume;
   }
 
@@ -152,16 +148,30 @@ class BluOSPlayer {
     this.infoAlbum.textContent = title3;
   }
 
-  // TODO: handle "local" images, e.g. "/Sources/images/ParadiseRadioIcon.png"
-  updateAlbumArt() {
+  async updateAlbumArt() {
     const { image } = this.status;
+    // Prepend base URL if image is a "local" path
+    const url = new URL(image, this.api.baseUrl).toString();
 
-    this.coverImage.src = image;
-    this.coverImage.alt = "Cover art";
+    // Set cover image
+    this.coverImage.src = url;
     this.element.style.setProperty(
       "--player-background-image",
-      `url("${image}")`
+      `url("${url}")`
     );
+
+    // Get dominant color from cover image and set as background
+    const tempImage = new Image();
+    tempImage.crossOrigin = "Anonymous";
+    tempImage.onload = () => {
+      const color = this.colorThief.getColor(tempImage);
+
+      this.element.style.setProperty(
+        "--player-background-color",
+        `rgb(${color.join(",")})`
+      );
+    };
+    tempImage.src = url;
   }
 
   updateVolume() {
@@ -235,20 +245,20 @@ class BluOSPlayer {
     this.stopPlayTimer();
 
     if (["play", "stream"].includes(this.status.state)) {
-      this.api.pause();
+      return this.api.pause();
     } else {
-      this.api.play();
+      return this.api.play();
     }
   }
 
   play() {
     this.stopPlayTimer();
-    this.api.play();
+    return this.api.play();
   }
 
   pause(toggle) {
     this.stopPlayTimer();
-    this.api.pause();
+    return this.api.pause();
   }
 
   seek(seconds) {
@@ -259,25 +269,25 @@ class BluOSPlayer {
     if (canSeek !== 1) return;
 
     const seek = Math.round((seconds / 100) * totlen);
-    this.query(`/Play?seek=${seek}`);
+    return this.query(`/Play?seek=${seek}`);
   }
 
   stop() {
     this.stopPlayTimer();
-    this.api.stop();
+    return this.api.stop();
   }
 
   prev() {
     this.stopPlayTimer();
-    this.api.prev();
+    return this.api.prev();
   }
 
   next() {
     this.stopPlayTimer();
-    this.api.next();
+    return this.api.next();
   }
 
   volume(level) {
-    this.api.volume(level);
+    return this.api.volume(level);
   }
 }
