@@ -215,8 +215,10 @@ class BluOSPlayer {
     // Update progress bar
     // if (typeof canSeek === 1) {
     if (typeof secs === "number" && typeof totlen === "number") {
+      this.progressBar.disabled = false;
       this.progressBar.value = (secs / totlen) * 100;
     } else {
+      this.progressBar.disabled = true;
       this.progressBar.value = 0;
     }
   }

@@ -20,6 +20,11 @@
   }
 }
 
+.progress-bar.progress-bar--disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
 .progress-bar__track {
   overflow: hidden;
   border-radius: var(--progress-bar-radius);

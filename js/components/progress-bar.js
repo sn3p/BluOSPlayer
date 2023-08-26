@@ -10,6 +10,7 @@ class ProgressBar {
     this.element = element;
     this.track = element.querySelector(".progress-bar__track");
 
+    this._disabled = false;
     this.scrubbing = false;
 
     // Create binded event handlers so we can remove them later
@@ -88,6 +89,19 @@ class ProgressBar {
 
   set value(percent) {
     this.element.style.setProperty("--progress-bar-progress", `${percent}%`);
+  }
+
+  /*
+  Getter and setter disabled state
+  */
+
+  get disabled() {
+    return this._disabled;
+  }
+
+  set disabled(value) {
+    this.element.classList.toggle("progress-bar--disabled", value);
+    this._disabled = value;
   }
 
   /*
