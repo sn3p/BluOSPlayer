@@ -50,10 +50,14 @@ class BluOSPlayer {
     this.timeCurrent = this.time.querySelector(".player__time--current");
     this.timeDuration = this.time.querySelector(".player__time--duration");
 
-    this.timeProgress = this.time.querySelector(".player__time--progress");
-    this.timeProgress.addEventListener("input", (event) => {
-      const { value } = event.target;
-      this.seek(value);
+    this.progressBar = new ProgressBar(
+      this.time.querySelector(".progress-bar")
+    );
+    this.progressBar.addEventListener("scrub-end", (event) => {
+      const { value } = event.detail;
+      const { totlen } = this.status;
+      const seek = Math.round((value / 100) * totlen);
+      this.seek(seek);
     });
   }
 
@@ -203,12 +207,17 @@ class BluOSPlayer {
       this.timeDuration.textContent = "∞";
     }
 
+    // Do not update progress bar if scrubbing
+    if (this.progressBar.scrubbing) {
+      return;
+    }
+
+    // Update progress bar
+    // if (typeof canSeek === 1) {
     if (typeof secs === "number" && typeof totlen === "number") {
-      this.timeProgress.disabled = false;
-      this.timeProgress.value = (secs / totlen) * 100;
+      this.progressBar.value = (secs / totlen) * 100;
     } else {
-      this.timeProgress.disabled = true;
-      this.timeProgress.value = 0;
+      this.progressBar.value = 0;
     }
   }
 
@@ -262,14 +271,12 @@ class BluOSPlayer {
   }
 
   seek(seconds) {
+    // if (this.status.canSeek !== 1) {
+    //   return false;
+    // }
+
     this.stopPlayTimer();
-    // this.api.seek(seconds);
-
-    const { canSeek, totlen } = this.status;
-    if (canSeek !== 1) return;
-
-    const seek = Math.round((seconds / 100) * totlen);
-    return this.query(`/Play?seek=${seek}`);
+    return this.api.seek(seconds);
   }
 
   stop() {

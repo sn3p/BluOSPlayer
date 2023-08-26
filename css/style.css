@@ -111,12 +111,6 @@ body {
   float: right;
 }
 
-.player__time--progress {
-  /* appearance: none; */
-  width: 100%;
-  cursor: pointer;
-}
-
 .player__playback {
   align-items: center;
   display: flex;
