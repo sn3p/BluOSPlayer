@@ -84,10 +84,9 @@ class BluOSPlayer {
       this.element.querySelector(".player__volume-bar")
     );
     this.volumeBar.addEventListener(
-      "scrub-start",
+      "scrub-end",
       this.onVolumeChange.bind(this)
     );
-    this.volumeBar.addEventListener("scrub", this.onVolumeChange.bind(this));
   }
 
   onScrub(event) {
