@@ -8,10 +8,10 @@
 class ProgressBar {
   constructor(element) {
     this.element = element;
-    this.track = element.querySelector(".progress-bar__track");
-
     this._disabled = false;
     this.scrubbing = false;
+
+    this.setupUI();
 
     // Create binded event handlers so we can remove them later
     this.onMouseMoveHandler = this.onMouseMove.bind(this);
@@ -20,6 +20,23 @@ class ProgressBar {
     this.element.addEventListener("mousedown", this.onMouseDown.bind(this));
 
     return this;
+  }
+
+  setupUI() {
+    const track = document.createElement("div");
+    track.classList.add("progress-bar__track");
+
+    const progress = document.createElement("div");
+    progress.classList.add("progress-bar__progress");
+    track.appendChild(progress);
+
+    const thumb = document.createElement("div");
+    thumb.classList.add("progress-bar__thumb");
+
+    this.element.appendChild(track);
+    this.element.appendChild(thumb);
+
+    this.track = track;
   }
 
   onMouseDown(event) {
