@@ -23,20 +23,13 @@ class ProgressBar {
   }
 
   setupUI() {
-    const track = document.createElement("div");
-    track.classList.add("progress-bar__track");
+    this.element.innerHTML = `
+      <div class="progress-bar__track">
+        <div class="progress-bar__progress"></div>
+      </div>
+      <div class="progress-bar__thumb"></div>`;
 
-    const progress = document.createElement("div");
-    progress.classList.add("progress-bar__progress");
-    track.appendChild(progress);
-
-    const thumb = document.createElement("div");
-    thumb.classList.add("progress-bar__thumb");
-
-    this.element.appendChild(track);
-    this.element.appendChild(thumb);
-
-    this.track = track;
+    this.track = this.element.querySelector(".progress-bar__track");
   }
 
   onMouseDown(event) {
