@@ -53,12 +53,23 @@ class BluOSPlayer {
     this.progressBar = new ProgressBar(
       this.time.querySelector(".progress-bar")
     );
-    this.progressBar.addEventListener("scrub-end", (event) => {
-      const { value } = event.detail;
-      const { totlen } = this.status;
-      const seek = Math.round((value / 100) * totlen);
-      this.seek(seek);
-    });
+    this.progressBar.addEventListener("scrub-start", this.onScrub.bind(this));
+    this.progressBar.addEventListener("scrub", this.onScrub.bind(this));
+    this.progressBar.addEventListener("scrub-end", this.onScrubEnd.bind(this));
+  }
+
+  onScrub(event) {
+    const { value } = event.detail;
+    this.status.secs = this.percentToSeconds(value);
+
+    this.updateTime();
+  }
+
+  onScrubEnd(event) {
+    const { value } = event.detail;
+    const seek = this.percentToSeconds(value);
+
+    this.seek(seek);
   }
 
   setupControls() {
@@ -122,6 +133,7 @@ class BluOSPlayer {
     this.updateAlbumArt();
     this.updateVolume();
     this.updateTime();
+    this.updateProgress();
     this.updateControls();
 
     // Start playback timer
@@ -135,6 +147,7 @@ class BluOSPlayer {
     this.playTimer = setInterval(() => {
       this.status.secs++;
       this.updateTime();
+      this.updateProgress();
     }, 1000);
   }
 
@@ -189,8 +202,28 @@ class BluOSPlayer {
     }
   }
 
-  // DOCS: Clients are required to increment the playback position, when
-  //  state is play or stream, based on the interval since the response.
+  updateProgress() {
+    let { secs, totlen } = this.status;
+    // secs = Math.min(secs, totlen);
+
+    // Do not update progress bar if scrubbing
+    if (this.progressBar.scrubbing) {
+      return false;
+    }
+
+    // Update progress bar
+    // if (typeof canSeek === 1) {
+    console.log(this.status);
+
+    if (typeof secs === "number" && typeof totlen === "number") {
+      this.progressBar.disabled = false;
+      this.progressBar.value = (secs / totlen) * 100;
+    } else {
+      this.progressBar.disabled = true;
+      this.progressBar.value = 0;
+    }
+  }
+
   updateTime() {
     let { secs, totlen } = this.status;
     // secs = Math.min(secs, totlen);
@@ -206,21 +239,13 @@ class BluOSPlayer {
     } else {
       this.timeDuration.textContent = "∞";
     }
+  }
 
-    // Do not update progress bar if scrubbing
-    if (this.progressBar.scrubbing) {
-      return;
-    }
+  updateControls() {
+    const { state } = this.status;
+    const isPlaying = ["play", "stream"].includes(state);
 
-    // Update progress bar
-    // if (typeof canSeek === 1) {
-    if (typeof secs === "number" && typeof totlen === "number") {
-      this.progressBar.disabled = false;
-      this.progressBar.value = (secs / totlen) * 100;
-    } else {
-      this.progressBar.disabled = true;
-      this.progressBar.value = 0;
-    }
+    this.controls["play-pause"].classList.toggle("is-playing", isPlaying);
   }
 
   displayTime(seconds) {
@@ -241,11 +266,9 @@ class BluOSPlayer {
     return time.join(":");
   }
 
-  updateControls() {
-    const { state } = this.status;
-    const isPlaying = ["play", "stream"].includes(state);
-
-    this.controls["play-pause"].classList.toggle("is-playing", isPlaying);
+  percentToSeconds(percent) {
+    const { totlen } = this.status;
+    return Math.round((percent / 100) * totlen);
   }
 
   /*
