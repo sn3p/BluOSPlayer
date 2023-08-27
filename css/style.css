@@ -165,9 +165,50 @@ body {
   gap: 0.5rem;
 }
 
-.player__volume-bar {
+.player__volume {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player__volume-bar {
   width: 120px;
+}
+
+.player__volume-mute {
+  display: flex;
+
+  .player__volume-mute-input {
+    display: none;
+
+    &:checked {
+      ~ .player__volume-mute--mute {
+        display: inline-block;
+      }
+
+      ~ .player__volume-mute--unmute {
+        display: none;
+      }
+    }
+  }
+
+  > svg {
+    cursor: pointer;
+    height: 1.1rem;
+    width: 1.1rem;
+    fill: white;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover > svg {
+    opacity: 1;
+  }
+
+  .player__volume-mute--mute {
+    display: none;
+  }
 }
 
 /*

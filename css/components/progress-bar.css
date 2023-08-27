@@ -1,6 +1,6 @@
 .progress-bar {
   --progress-bar-progress: 0%;
-  --progress-bar-height: 12px;
+  --progress-bar-height: 10px;
   --progress-bar-track-height: 4px;
   --progress-bar-radius: 100vw;
   --bg-color: hsla(0, 0%, 100%, 0.3);

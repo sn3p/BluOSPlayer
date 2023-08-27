@@ -79,6 +79,14 @@ class BluOSPlayer {
     this.progressBar.addEventListener("scrub", this.onScrub.bind(this));
     this.progressBar.addEventListener("scrub-end", this.onScrubEnd.bind(this));
 
+    // Volume toggle (mute)
+    this.volumeMuteCheckbox = this.element.querySelector(
+      ".player__volume-mute-input"
+    );
+    this.volumeMuteCheckbox.addEventListener("change", (event) => {
+      this.mute(event.target.checked);
+    });
+
     // Volume bar
     this.volumeBar = new ProgressBar(
       this.element.querySelector(".player__volume-bar")
@@ -196,7 +204,7 @@ class BluOSPlayer {
   }
 
   updateVolume() {
-    const { volume } = this.status;
+    const { volume, mute } = this.status;
 
     if (typeof volume == "number") {
       this.volumeBar.disabled = false;
@@ -204,6 +212,8 @@ class BluOSPlayer {
     } else {
       this.volumeBar.disabled = true;
     }
+
+    this.volumeMuteCheckbox.checked = mute === 1;
   }
 
   updateProgress() {
@@ -217,8 +227,6 @@ class BluOSPlayer {
 
     // Update progress bar
     // if (typeof canSeek === 1) {
-    console.log(this.status);
-
     if (typeof secs === "number" && typeof totlen === "number") {
       this.progressBar.disabled = false;
       this.progressBar.value = (secs / totlen) * 100;
@@ -325,5 +333,9 @@ class BluOSPlayer {
 
   volume(level) {
     return this.api.volume(level);
+  }
+
+  mute(mute) {
+    return this.api.mute(mute);
   }
 }
