@@ -49,27 +49,6 @@ class BluOSPlayer {
     this.time = this.element.querySelector(".player__time");
     this.timeCurrent = this.time.querySelector(".player__time--current");
     this.timeDuration = this.time.querySelector(".player__time--duration");
-
-    this.progressBar = new ProgressBar(
-      this.time.querySelector(".progress-bar")
-    );
-    this.progressBar.addEventListener("scrub-start", this.onScrub.bind(this));
-    this.progressBar.addEventListener("scrub", this.onScrub.bind(this));
-    this.progressBar.addEventListener("scrub-end", this.onScrubEnd.bind(this));
-  }
-
-  onScrub(event) {
-    const { value } = event.detail;
-    this.status.secs = this.percentToSeconds(value);
-
-    this.updateTime();
-  }
-
-  onScrubEnd(event) {
-    const { value } = event.detail;
-    const seek = this.percentToSeconds(value);
-
-    this.seek(seek);
   }
 
   setupControls() {
@@ -92,13 +71,39 @@ class BluOSPlayer {
       this.controls[name] = el;
     });
 
-    // Volume
-    const volume = element.querySelector(".player__volume");
-    volume.addEventListener("change", (event) => {
-      const volume = Number(event.target.value);
-      this.volume(volume);
-    });
-    this.controls.volume = volume;
+    // Progress bar
+    this.progressBar = new ProgressBar(
+      this.element.querySelector(".player__progress-bar")
+    );
+    this.progressBar.addEventListener("scrub-start", this.onScrub.bind(this));
+    this.progressBar.addEventListener("scrub", this.onScrub.bind(this));
+    this.progressBar.addEventListener("scrub-end", this.onScrubEnd.bind(this));
+
+    // Volume bar
+    this.volumeBar = new ProgressBar(
+      this.element.querySelector(".player__volume-bar")
+    );
+    this.volumeBar.addEventListener(
+      "scrub-start",
+      this.onVolumeChange.bind(this)
+    );
+    this.volumeBar.addEventListener("scrub", this.onVolumeChange.bind(this));
+  }
+
+  onScrub(event) {
+    this.status.secs = this.percentToSeconds(event.detail.value);
+
+    this.updateTime();
+  }
+
+  onScrubEnd(event) {
+    const seek = this.percentToSeconds(event.detail.value);
+
+    this.seek(seek);
+  }
+
+  onVolumeChange(event) {
+    this.volume(event.detail.value);
   }
 
   // Listening to the player
@@ -195,10 +200,10 @@ class BluOSPlayer {
     const { volume } = this.status;
 
     if (typeof volume == "number") {
-      this.controls.volume.disabled = false;
-      this.controls.volume.value = volume;
+      this.volumeBar.disabled = false;
+      this.volumeBar.value = volume;
     } else {
-      this.controls.volume.disabled = true;
+      this.volumeBar.disabled = true;
     }
   }
 

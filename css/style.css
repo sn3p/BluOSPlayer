@@ -165,8 +165,9 @@ body {
   gap: 0.5rem;
 }
 
-.player__volume {
+.player__volume-bar {
   margin-left: auto;
+  width: 120px;
 }
 
 /*

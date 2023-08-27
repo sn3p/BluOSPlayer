@@ -8,9 +8,9 @@
   --is-active-fg-color: #1db954;
 
   background-color: var(--color-primary);
-  position: relative;
-  height: var(--progress-bar-height);
   cursor: pointer;
+  height: var(--progress-bar-height);
+  position: relative;
 }
 
 .progress-bar:hover,
@@ -22,18 +22,19 @@
 
 .progress-bar.progress-bar--disabled {
   cursor: default;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .progress-bar__track {
-  overflow: hidden;
-  border-radius: var(--progress-bar-radius);
   background-color: var(--bg-color);
+  border-radius: var(--progress-bar-radius);
   display: flex;
+  height: var(--progress-bar-track-height);
+  overflow: hidden;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  height: var(--progress-bar-track-height);
   width: 100%;
 }
 
@@ -44,14 +45,14 @@
 }
 
 .progress-bar__thumb {
-  position: absolute;
   background-color: #fff;
   border-radius: 50%;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
   display: none;
+  height: var(--progress-bar-height);
+  left: var(--progress-bar-progress);
+  position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
-  left: var(--progress-bar-progress);
   width: var(--progress-bar-height);
-  height: var(--progress-bar-height);
 }
