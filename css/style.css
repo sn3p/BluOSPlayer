@@ -154,9 +154,13 @@ body {
   }
 }
 .player__controls .player__button--play-pause {
-  font-size: 2rem;
   height: 3.2rem;
   width: 3.2rem;
+
+  > svg {
+    height: 1.3em;
+    width: 1.3em;
+  }
 }
 .player__controls .player__button--play-pause::before {
   /* backdrop-filter: blur(8px); */
@@ -167,13 +171,17 @@ body {
   opacity: 0.5;
   position: absolute;
 }
-.player__controls .player__button--play-pause::after {
-  content: "⏵︎";
-  line-height: 1;
-  z-index: 1;
+.player__controls .player__button--play-pause-pause {
+  display: none;
 }
-.player__controls .player__button--play-pause.is-playing::after {
-  content: "⏸︎";
+.player__controls .player__button--play-pause.is-playing {
+  .player__button--play-pause-play {
+    display: none;
+  }
+
+  .player__button--play-pause-pause {
+    display: inline-block;
+  }
 }
 
 .player__volume {
