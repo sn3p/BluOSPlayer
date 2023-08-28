@@ -4,9 +4,9 @@ body {
 }
 
 * {
-  padding: 0;
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -59,8 +59,8 @@ body {
 
 .player__container {
   max-width: 600px;
-  width: 100%;
   position: relative;
+  width: 100%;
   z-index: 2;
 }
 
@@ -68,8 +68,8 @@ body {
   align-items: center;
   display: flex;
   flex-direction: column;
-  text-align: center;
   mix-blend-mode: overlay;
+  text-align: center;
   /* mix-blend-mode: difference; */
 }
 .player__info > :empty {
@@ -97,79 +97,91 @@ body {
 .player__cover--image {
   background-color: black;
   box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, 0.4);
-  width: 100%;
   max-height: 400px;
   max-width: 400px;
+  width: 100%;
 }
 
 .player__time {
-  margin: 1rem 0;
+  margin: 2rem 0 1rem;
 }
-/* .player__time--current {
-} */
+.player__time--current,
+.player__time--duration {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
 .player__time--duration {
   float: right;
-}
-
-.player__playback {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin: 1rem 0;
-}
-.player__playback .player__button {
-  appearance: none;
-  border-radius: 50%;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  height: 1rem;
-  width: 1rem;
-  position: relative;
-  padding: 0;
-}
-.player__playback .player__button::before {
-  content: "";
-  border-radius: 50%;
-  inset: 0;
-  position: absolute;
-  background-color: var(--player-background-color);
-  opacity: 0.5;
-}
-.player__playback .player__button::after {
-  content: "";
-  z-index: 1;
-  line-height: 1;
-}
-.player__playback .player__button--play-pause {
-  font-size: 2rem;
-  height: 3.2rem;
-  width: 3.2rem;
-}
-.player__playback .player__button--play-pause::after {
-  content: "⏵︎";
-}
-.player__playback .player__button--play-pause.is-playing::after {
-  content: "⏸︎";
 }
 
 .player__controls {
   align-items: center;
   display: flex;
   gap: 0.5rem;
+  justify-content: center;
+  margin: 1rem 0;
+
+  &::before {
+    content: "";
+    flex: 1;
+  }
+}
+.player__controls .player__button {
+  align-items: center;
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1rem;
+  height: 1.5rem;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  width: 1.5rem;
+  opacity: 0.75;
+
+  > svg {
+    fill: currentColor;
+    height: 1em;
+    width: 1em;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+.player__controls .player__button--play-pause {
+  font-size: 2rem;
+  height: 3.2rem;
+  width: 3.2rem;
+}
+.player__controls .player__button--play-pause::before {
+  /* backdrop-filter: blur(8px); */
+  background-color: var(--player-background-color);
+  border-radius: 50%;
+  content: "";
+  inset: 0;
+  opacity: 0.5;
+  position: absolute;
+}
+.player__controls .player__button--play-pause::after {
+  content: "⏵︎";
+  line-height: 1;
+  z-index: 1;
+}
+.player__controls .player__button--play-pause.is-playing::after {
+  content: "⏸︎";
 }
 
 .player__volume {
-  margin-left: auto;
-  display: flex;
   align-items: center;
+  display: flex;
+  flex: 1;
   gap: 0.5rem;
+  justify-content: flex-end;
 }
 
 .player__volume-bar {
@@ -195,11 +207,11 @@ body {
 
   > svg {
     cursor: pointer;
-    height: 1.1rem;
-    width: 1.1rem;
     fill: white;
+    height: 1.1rem;
     opacity: 0.75;
     transition: opacity 0.2s ease;
+    width: 1.1rem;
   }
 
   &:hover > svg {
@@ -216,16 +228,32 @@ Debugging
 */
 
 .debug-button {
+  appearance: none;
+  background: none;
+  border: 1px solid white;
+  border-radius: 0.2rem;
   bottom: 1rem;
+  color: white;
+  cursor: pointer;
+  font-size: 0.75rem;
   left: 1rem;
+  line-height: 1;
+  opacity: 0.5;
+  padding: 0.15em 0.4em;
   position: fixed;
+  text-transform: uppercase;
   z-index: 1;
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 #debug {
   border: none;
   border-radius: 0.5rem;
   box-shadow: 0 1rem 1.5rem rgba(0, 0, 0, 0.2);
+  margin: 2rem auto;
   max-width: 1024px;
   padding: 1.5em;
   width: calc(100% - 4rem);
@@ -240,6 +268,7 @@ Debugging
   align-items: center;
   display: flex;
   gap: 0.5rem;
+  margin-bottom: 0.5rem;
   width: 100%;
 }
 

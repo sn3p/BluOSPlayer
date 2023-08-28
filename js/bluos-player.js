@@ -53,20 +53,11 @@ class BluOSPlayer {
 
   setupControls() {
     const element = this.element.querySelector(".player__controls");
-    const classPrefix = ".player__button--";
-
-    // Old
     this.controls = { element };
-    ["play", "pause", "stop", "prev", "next"].forEach((name) => {
-      const el = element.querySelector(classPrefix + name);
-      el.addEventListener("click", this[name].bind(this));
-      this.controls[name] = el;
-    });
 
-    // New
-    const playback = this.element.querySelector(".player__playback");
-    ["play-pause"].forEach((name) => {
-      const el = playback.querySelector(classPrefix + name);
+    const classPrefix = ".player__button--";
+    ["play-pause", "prev", "next"].forEach((name) => {
+      const el = element.querySelector(classPrefix + name);
       el.addEventListener("click", this[name].bind(this));
       this.controls[name] = el;
     });
@@ -79,7 +70,7 @@ class BluOSPlayer {
     this.progressBar.addEventListener("scrub", this.onScrub.bind(this));
     this.progressBar.addEventListener("scrub-end", this.onScrubEnd.bind(this));
 
-    // Volume toggle (mute)
+    // Volume mute toggle
     this.volumeMuteCheckbox = this.element.querySelector(
       ".player__volume-mute-input"
     );
